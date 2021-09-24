@@ -261,8 +261,6 @@ Guide --> https://core.telegram.org/api/obtaining_api_id
                 self.cursor.execute(sql)
                 self._db.commit()
                 print(f'The {find_key[j]} user has been updated !!')
-    
-start = Auto_reply('root','#kamal@4892:)')
 
 # you need to install mysql on your os and write user password down here
-# instanse = Auto_reply('mysql_user','mysql_password')
+instanse = Auto_reply('mysql_user','mysql_password')
