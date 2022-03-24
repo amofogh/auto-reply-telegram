@@ -1,17 +1,16 @@
 from telethon import TelegramClient , events
 from time import asctime , sleep
-from re import search
 from os import mkdir , path
 from colorama import Fore, Style
-import mysql.connector
+import sqlite3
 
 class Auto_reply(object):
     
-    def __init__(self , mysql_user , mysql_password ):
+    def __init__(self ):
         '''
         run just class to lead to the menu
         '''
-        self.connect_db(mysql_user, mysql_password)
+        self.connect_db()
         
         # login/signup menu
         chance = 3
@@ -45,7 +44,7 @@ Guide --> https://core.telegram.org/api/obtaining_api_id
             # get all info for login
             try :
                 print(Fore.RED + '{0} Chance remaining !!'.format(chance) + Style.RESET_ALL)
-                username = input('Enter your username : ')
+                username = input('Enter your username or just a name if you havent : ')
                 api_id = input('Enter your api_id : ')
                 api_hash = input('Enter your api_hash : ') 
                 phone = int(input('Enter your phone number (Ex:989121234545) : '))
@@ -71,7 +70,7 @@ Guide --> https://core.telegram.org/api/obtaining_api_id
     def get_username(self): #checking username and
         print('Welcome to the Check Username')
 
-        person = input('Enter your username please : ')
+        person = input('Enter your username or name please : ')
         
         #check username in database
         # (username ,api_id , api_hash , phone_number , password)
@@ -168,30 +167,17 @@ Guide --> https://core.telegram.org/api/obtaining_api_id
             mkdir(dir_name)
     
     # write and read from database
-    def connect_db(self,user , password):
-        
-        self._db = mysql.connector.connect(
-            host = "localhost",
-            user = user,
-            password = password
-        )
+    def connect_db(self):
+        self._db = sqlite3.connect('telegram_users.db')
         self.cursor = self._db.cursor()
         
-        #create database and table if not exists then connect to them and use telegram_users as main db
+        #create table if not exists then connect to them and use telegram_users as main db
         self.create_db()
-        self._db = mysql.connector.connect(
-            host = "localhost",
-            user = user,
-            password = password,
-            database = 'telegram_users'
-        )
     
         self.cursor = self._db.cursor()
     
     def create_db(self):
-        self.cursor.execute('''BEGIN;
-                            CREATE DATABASE IF NOT EXISTS telegram_users ;
-                            use telegram_users;
+        self.cursor.execute('''
                             CREATE TABLE IF NOT EXISTS accounts (
                                 username varchar(255) NOT NULL PRIMARY KEY ,
                                 api_id BIGINT NOT NULL,
@@ -199,7 +185,6 @@ Guide --> https://core.telegram.org/api/obtaining_api_id
                                 phone_number BIGINT NOT NULL UNIQUE,
                                 password varchar(255)
                                 );
-                                COMMIT;
         ''')
         
     def add_user(self , username , api_id:int , api_hash , phone_number:int , password = None):
@@ -207,7 +192,7 @@ Guide --> https://core.telegram.org/api/obtaining_api_id
         write phone_number without 0 on the first    
         '''
         # (username , api_id , api_hash , phone_number , password)
-        sql = 'INSERT INTO accounts VALUES (%s , %s , %s , %s ,%s )'
+        sql = 'INSERT INTO accounts VALUES (? , ? , ? , ? , ? )'
         val = (username , api_id , api_hash , phone_number , password )
         
         self.cursor.execute(sql,val)
@@ -262,5 +247,4 @@ Guide --> https://core.telegram.org/api/obtaining_api_id
                 self._db.commit()
                 print(f'The {find_key[j]} user has been updated !!')
 
-# you need to install mysql on your os and write user password down here
-instanse = Auto_reply('mysql_user','mysql_password')
+instanse = Auto_reply()
