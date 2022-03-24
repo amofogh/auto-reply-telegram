@@ -227,8 +227,6 @@ Guide --> https://core.telegram.org/api/obtaining_api_id
         username var have to be dict too and key is for find the row with WHERE
         the keys in the username value have to be username or phone_number (exact word)
         '''
-        #check the variables
-        
         #loop for all changes in the dict
         for i in changes:
                 
