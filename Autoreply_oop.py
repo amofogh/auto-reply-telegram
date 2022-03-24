@@ -16,12 +16,14 @@ class Auto_reply(object):
         chance = 3
         while chance :
             print(Fore.RED + '{0} chance remaining'.format(chance) + Style.RESET_ALL)
-            acc_status = input('Do you have account ? (yes/no) : ')
+            acc_status = input('Do you have account ? (yes/no) (0 for something else) : ')
             if acc_status == 'yes': #Have session file
                 self.get_username()
                 break
             elif acc_status == 'no' :
                 self.session_creator()
+                break
+            elif acc_status == '0':
                 break
             else:
                 if chance == 1 : #break the while after 3 chance
@@ -219,32 +221,20 @@ Guide --> https://core.telegram.org/api/obtaining_api_id
         self.cursor.execute(sql)
         self._db.commit()
     
-    def update_user(self , find_key:dict , changes:dict , table_name):
+    def update_user(self , username:dict , changes:dict , table_name='accounts'):
         '''
         changes var have to be dict EX --> {api_hash:qwe , api_id = 123}
-        find_key var have to be dict too and key is for find the row with WHERE
-        the keys in the find_key value have to be username or phone_number (exact word)
+        username var have to be dict too and key is for find the row with WHERE
+        the keys in the username value have to be username or phone_number (exact word)
         '''
         #check the variables
-        if type(changes) != dict or type(find_key) != dict:
-            raise ValueError('The changes or find_key value have be dictionary !!') 
         
-        if len(find_key) != 1 :
-            raise ValueError('You have to give just 1 finding key to the function') 
-
-        for dict_keys in find_key.keys():
-            #if the keys of the find_key not 2 of them raise error
-            if dict_keys != 'phone_number' and dict_keys != 'username':
-                raise ValueError('The key of the find_key value have to be exact word username or phone_number') 
-        
-        # for in the finding key we need to find the row in database
-        for j in find_key :
-            #loop for all changes in the dict
-            for i in changes:
+        #loop for all changes in the dict
+        for i in changes:
                 
-                sql = "UPDATE {0} SET {1} = '{2}' WHERE {3} = '{4}'".format(table_name,i,changes[i],j,find_key[j])
-                self.cursor.execute(sql)
-                self._db.commit()
-                print(f'The {find_key[j]} user has been updated !!')
+            sql = "UPDATE {0} SET {1} = '{2}' WHERE {3} = '{4}'".format(table_name,i,changes[i],'username',username)
+            self.cursor.execute(sql)
+            self._db.commit()
+            print(f'The {username} user has been updated !!')
 
-instanse = Auto_reply()
+instanse = Auto_reply().update_user('am_ofogh', {'api_id': 111})
